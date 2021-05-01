@@ -11,12 +11,3 @@ import time
 import pyperclip
 from datetime import datetime, date 
 import datetime 
-
-
-# gwonin branch  
-def insert_due_date():
-    pass
-
-# gwonin branch 
-def insert_due_time():
-    pass
