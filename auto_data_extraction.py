@@ -1,28 +1,6 @@
 #캘린더 제목란에 과제명 작성 코드
 
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.select import Select
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.alert import Alert
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-import time
-import pyperclip
-from bs4 import BeautifulSoup
 
-options = Options()
-options.add_argument('--disable-gpu')
-options.add_argument('--disable-extensions')
-options.add_argument('--proxy-server="direct://"')
-options.add_argument('--proxy-bypass-list=*')
-options.add_argument('--start-maximized')
-options.add_experimental_option("excludeSwitches", ['enable-automation'])
-DRIVER_PATH = "C:/Users/bjw16/Desktop/VSCODE/SW프로젝트기초/chromedriver"
-driver = webdriver.Chrome(executable_path=DRIVER_PATH, chrome_options=options)
-driver.get('https://lms.sunmoon.ac.kr/ilos/main/member/login_form.acl')
 
 #데이터 추출 메서드(과제명)
 def title_extract():
