@@ -15,7 +15,23 @@ import datetime
 
 # gwonin branch  
 def insert_due_date():
-    pass
+    # due date
+    calendar_end_date = driver.find_element_by_xpath('//*[@id="end_date"]')
+    time.sleep(2)
+    driver.execute_script("arguments[0].click();", calendar_end_date)
+    time.sleep(2)
+    # calendar_end_date.click()
+    pyperclip.copy(list_data2[0])
+
+    calendar_end_date.send_keys(Keys.COMMAND, 'a')
+    time.sleep(2)
+    calendar_end_date.send_keys(Keys.COMMAND, 'v')
+
+    time.sleep(2)
+    calendar_start_date = driver.find_element_by_xpath('//*[@id="start_date"]')
+    time.sleep(2)
+    driver.execute_script("arguments[0].click();", calendar_start_date)
+
 
 # gwonin branch 
 def insert_due_time():
