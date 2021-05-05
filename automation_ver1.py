@@ -35,4 +35,27 @@ def insert_due_date():
 
 # gwonin branch 
 def insert_due_time():
-    pass
+    # due time
+    due_time = driver.find_element_by_xpath(
+        '//*[@id="_real_schedule_body"]/div[2]/div/div[4]/div[3]/div/div[5]/div[1]/input')
+    driver.execute_script("arguments[0].click();", due_time)
+    time.sleep(2)
+    pyperclip.copy(list_data2[1]) #1. 먼저. 
+    print('checking now... ', list_data2[1])
+    due_time.send_keys(Keys.COMMAND, 'a') #2. 나중에. 순서가 영향을 미친다... 
+    due_time.send_keys(Keys.COMMAND, 'v')
+    time.sleep(2)
+
+    time.sleep(2)
+    calendar_start_date = driver.find_element_by_xpath('//*[@id="start_date"]')
+    time.sleep(2)
+    driver.execute_script("arguments[0].click();", calendar_start_date)
+
+    # calendar_start_date.click()
+
+    temp1 = driver.find_element_by_css_selector(
+        "#_real_schedule_body > div.schedule_header > div > button.save._save_btn._save")
+    time.sleep(2)
+    driver.execute_script("arguments[0].click();", temp1)
+    temp1.click()
+
