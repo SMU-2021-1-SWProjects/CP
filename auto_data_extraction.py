@@ -1,3 +1,5 @@
+#캘린더 제목란에 과제명 작성 코드
+
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.select import Select
@@ -9,8 +11,7 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 import time
 import pyperclip
-from datetime import datetime, date 
-import datetime 
+from bs4 import BeautifulSoup
 
 options = Options()
 options.add_argument('--disable-gpu')
@@ -74,19 +75,3 @@ def save_title():
 
     pyperclip.copy(list_data0)
     calendar_title.send_keys(Keys.CONTROL, 'v')
-
-
-#추출한 현재 날짜 데이터 예시(년,월,일)
-extract_data = [2021,4,25]
-
-now_data = [datetime.today().year,datetime.today().month,datetime.today().day]
-
-if now_data[0] >= extract_data[0]:
-    print("save")
-elif now_data[1] >= extract_data[1]:
-    print("save")
-elif now_data[3] >= extract_data[3]:
-    print("save")
-else:
-    pass
-    print("시간 초과 데이터는 필요없음.")
