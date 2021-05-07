@@ -9,24 +9,18 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 import time
 import pyperclip
-from datetime import datetime, date 
-import datetime 
+from datetime import datetime, date
+import datetime
 
-#browser시작
-options = Options()
-options.add_argument('--disable-gpu')
-options.add_argument('--disable-extensions')
-options.add_argument('--proxy-server="direct://"')
-options.add_argument('--proxy-bypass-list=*')
-options.add_argument('--start-maximized')
-options.add_experimental_option("excludeSwitches", ['enable-automation'])
-DRIVER_PATH = "" #chromedrive가 저장되어 있는 파일의 위치 입력
+# browser시작
+DRIVER_PATH = ""  # chromedrive가 저장되어 있는 파일의 위치 입력
 driver = webdriver.Chrome(executable_path=DRIVER_PATH, chrome_options=options)
+
 
 def e_Login(driver):
     driver.get('https://lms.sunmoon.ac.kr/ilos/main/member/login_form.acl')
 
-    # 3. 要素を探して操作する 
+    # 3. 要素を探して操作する
     # 3-1. login
     id_elem = driver.find_element_by_css_selector("#usr_id")
     pyperclip.copy('whdhks455')
@@ -42,61 +36,55 @@ def e_Login(driver):
     login_elem.click()
     time.sleep(1)
 
-
-    # changing language 
+    # changing language
     bar = driver.find_element_by_css_selector("#LANG")
     bar.click()
     language = driver.find_element_by_xpath('//option[@value="ko"]')
     language.click()
 
-#데이터 추출 메서드(과제명)
-def title_extract():
-    list1 = []
-    for i in range(len(list1)):
-        driver.find_elements_by_css_selector('.sub_open')[i].click()
-        try:
-            driver.find_element_by_id('st_report').click()
-            list2 = driver.find_elements_by_css_selector('.subjt_top')
-            for j in range(len(list2)):
-                driver.find_elements_by_css_selector('.subjt_top')[j].click()
-                time.sleep(3)
-                date1 = driver.find_element_by_css_selector(
-                    '#content_text > table > tbody > tr:nth-child(1) > td').text
-                date2 = driver.find_element_by_css_selector(
-                    '#content_text > table > tbody > tr:nth-child(3) > td').text
-                date3 = driver.find_element_by_css_selector(
-                    '#content_text > table > tbody > tr:nth-child(4) > td').text
-                print(date1, date2, date3)
-                driver.find_element_by_css_selector('.site_button').click()
 
-        except:
-            pass
+# gwonin branch
+def insert_due_date():
+    # due date
+    calendar_end_date = driver.find_element_by_xpath('//*[@id="end_date"]')
+    time.sleep(2)
+    driver.execute_script("arguments[0].click();", calendar_end_date)
+    time.sleep(2)
+    # calendar_end_date.click()
+    pyperclip.copy(list_data2[0])
 
-    driver.find_element_by_id('logo_link').click()
-    list_end = []
-    list_end.append(date1 + "," + date2 + "," + date3)
-    print(len(list_end))
-
-    for i in range(len(list_end)):
-        print(list_end[i])
-
-#캘린더 제목란에 저장하는 메서드
-def save_title():
-    list_end=[]
-    for i in range(len(list_end)):
-        if i != 0:
-            driver.get("https://calendar.naver.com")
-            print('ss')
-        else:
-            pass
-        list_data = list_end[i].split(",")
-        list_data0 = list_data[0]  # 제목
-
-    #calendar title부분에 자동 저장
-    calendar_title = driver.find_element_by_xpath('//*[@id="tx0_0"]')
+    calendar_end_date.send_keys(Keys.COMMAND, 'a')
+    time.sleep(2)
+    calendar_end_date.send_keys(Keys.COMMAND, 'v')
 
     time.sleep(2)
-    driver.execute_script("arguments[0].click();", calendar_title)
+    calendar_start_date = driver.find_element_by_xpath('//*[@id="start_date"]')
+    time.sleep(2)
+    driver.execute_script("arguments[0].click();", calendar_start_date)
 
-    pyperclip.copy(list_data0)
-    calendar_title.send_keys(Keys.CONTROL, 'v')
+
+# gwonin branch
+def insert_due_time():
+    # due time
+    due_time = driver.find_element_by_xpath(
+        '//*[@id="_real_schedule_body"]/div[2]/div/div[4]/div[3]/div/div[5]/div[1]/input')
+    driver.execute_script("arguments[0].click();", due_time)
+    time.sleep(2)
+    pyperclip.copy(list_data2[1])  # 1. 먼저.
+    print('checking now... ', list_data2[1])
+    due_time.send_keys(Keys.COMMAND, 'a')  # 2. 나중에. 순서가 영향을 미친다...
+    due_time.send_keys(Keys.COMMAND, 'v')
+    time.sleep(2)
+
+    time.sleep(2)
+    calendar_start_date = driver.find_element_by_xpath('//*[@id="start_date"]')
+    time.sleep(2)
+    driver.execute_script("arguments[0].click();", calendar_start_date)
+
+    # calendar_start_date.click()
+
+    temp1 = driver.find_element_by_css_selector(
+        "#_real_schedule_body > div.schedule_header > div > button.save._save_btn._save")
+    time.sleep(2)
+    driver.execute_script("arguments[0].click();", temp1)
+    temp1.click()
