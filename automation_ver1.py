@@ -1,13 +1,17 @@
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.select import Select
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.alert import Alert
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
-import time
-import pyperclip
-from datetime import datetime, date 
-import datetime 
+def login_naver(driver):
+    driver.get("https://calendar.naver.com")
+    tag_id = driver.find_element_by_css_selector('#id')
+    tag_id.click()
+    pyperclip.copy('id')
+    tag_id.send_keys(Keys.COMMAND, 'v')
+    time.sleep(1)
+
+    tag_pw = driver.find_element_by_css_selector('#pw')
+    tag_pw.click()
+    pyperclip.copy('pw')
+    tag_pw.send_keys(Keys.COMMAND, 'v')
+    time.sleep(1)
+
+    login_btn = driver.find_element_by_css_selector('#log\.login')
+    login_btn.click()
+    time.sleep(3)
