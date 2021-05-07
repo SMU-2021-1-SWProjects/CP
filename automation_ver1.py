@@ -12,10 +12,10 @@ import pyperclip
 from datetime import datetime, date
 import datetime
 
+
 # browser시작
 DRIVER_PATH = ""  # chromedrive가 저장되어 있는 파일의 위치 입력
 driver = webdriver.Chrome(executable_path=DRIVER_PATH, chrome_options=options)
-
 
 def e_Login(driver):
     driver.get('https://lms.sunmoon.ac.kr/ilos/main/member/login_form.acl')
@@ -42,6 +42,23 @@ def e_Login(driver):
     language = driver.find_element_by_xpath('//option[@value="ko"]')
     language.click()
 
+def login_naver(driver):
+    driver.get("https://calendar.naver.com")
+    tag_id = driver.find_element_by_css_selector('#id')
+    tag_id.click()
+    pyperclip.copy('id')
+    tag_id.send_keys(Keys.COMMAND, 'v')
+    time.sleep(1)
+
+    tag_pw = driver.find_element_by_css_selector('#pw')
+    tag_pw.click()
+    pyperclip.copy('pw')
+    tag_pw.send_keys(Keys.COMMAND, 'v')
+    time.sleep(1)
+
+    login_btn = driver.find_element_by_css_selector('#log\.login')
+    login_btn.click()
+    time.sleep(3)
 
 # gwonin branch
 def insert_due_date():
@@ -61,7 +78,6 @@ def insert_due_date():
     calendar_start_date = driver.find_element_by_xpath('//*[@id="start_date"]')
     time.sleep(2)
     driver.execute_script("arguments[0].click();", calendar_start_date)
-
 
 # gwonin branch
 def insert_due_time():
