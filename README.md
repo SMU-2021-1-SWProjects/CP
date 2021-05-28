@@ -1,13 +1,13 @@
 # react native 환경 설치와 실행 과정입니다. 
 ### install react native 
-npm install -g expo-cli
+    npm install -g expo-cli
 
 ### create react native project 
-expo init AwesomeProject
+    expo init AwesomeProject
 
 ### start react native project 
-cd AwesomeProject
-npm start # you can also use: expo start
+    cd AwesomeProject
+    npm start # you can also use: expo start
 
 ### react native 실행 환경에 필요한 package입니다.
 "dependencies": {
