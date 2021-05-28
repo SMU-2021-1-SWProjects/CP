@@ -57,3 +57,6 @@
     from selenium.webdriver.support import expected_conditions as EC
     from selenium.webdriver.support.ui import Select
     from selenium.webdriver.support.ui import WebDriverWait
+    
+    
+    추가적인 Selenium 사용법은 https://greeksharifa.github.io/references/2020/10/30/python-selenium-usage/ 참고
