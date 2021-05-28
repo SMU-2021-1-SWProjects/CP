@@ -1,6 +1,7 @@
 # react native 우리가 사용했던 package들입니다. 
 
 "dependencies": {
+
     "@react-native-community/masked-view": "0.1.10",
     "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.4",
