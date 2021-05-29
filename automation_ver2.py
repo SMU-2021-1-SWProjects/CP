@@ -22,6 +22,22 @@ def send_text(text, url):
     })
     requests.post(slack_url, data=data)
 
+def get_driver():
+    # options = webdriver.ChromeOptions()
+    options = Options()
+    options.add_argument('--disable-gpu');
+    options.add_argument('--disable-extensions');
+    options.add_argument('--proxy-server="direct://"');
+    options.add_argument('--proxy-bypass-list=*');
+    options.add_argument('--start-maximized');
+    options.add_argument('--kiosk')
+    options.add_experimental_option("excludeSwitches", ['enable-automation'])
+
+    DRIVER_PATH = "chomedriver path"
+    driver = webdriver.Chrome(executable_path=DRIVER_PATH, chrome_options=options)
+
+    return driver
+
 def login_sunmoon(driver, eid, epw):
     driver.get("https://lms.sunmoon.ac.kr/ilos/main/member/login_form.acl")
     time.sleep(1)
