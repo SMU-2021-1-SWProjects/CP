@@ -14,6 +14,14 @@ import datetime
 import pymysql
 
 
+def send_text(text, url):
+    slack_url = url
+    data = json.dumps({
+        'username': 'auto-add-to-naver-calendar',
+        'text': text,
+    })
+    requests.post(slack_url, data=data)
+
 def login_sunmoon(driver, eid, epw):
     driver.get("https://lms.sunmoon.ac.kr/ilos/main/member/login_form.acl")
     time.sleep(1)
