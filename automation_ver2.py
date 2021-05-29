@@ -219,33 +219,28 @@ def add_calendar(driver, data_lst):
         driver.get("https://calendar.naver.com")
         time.sleep(2)
 
-
 def main():
-    #options = Options()
-    options = webdriver.ChromeOptions()
-    options = Options()
-    options.add_argument('--disable-gpu')
-    options.add_argument('--disable-extensions')
-    options.add_argument('--proxy-server="direct://"')
-    options.add_argument('--proxy-bypass-list=*')
-    options.add_argument('--start-maximized')
-    # options.add_argument('--kiosk') #window最大
-    # chrome は自動テスト ソフトウェアによって制御されています
-    options.add_experimental_option("excludeSwitches", ['enable-automation'])
-
-    DRIVER_PATH = "/Users/ritsushi/Documents/chomedriver/chromedriver_ver90.0.4430.24"
-    driver = webdriver.Chrome(
-        executable_path=DRIVER_PATH, chrome_options=options)
-
-    # login_sunmoon(driver)
-    # data = data_extraction(driver)
-    # # login_naver(driver)
-    # # add_calendar(driver, data)
-    # driver.close()
-    # driver.quit()
-    database(driver)
-    print("driver stop")
-
+    conn = pymysql.connect(host='localhost', user='root',
+                       password='pw', db='db name', charset='utf8')
+    try:
+        with conn.cursor() as curs:
+            sql = "sql문"
+            curs.execute(sql)  # 실행할 sql문 넣기
+            rs = curs.fetchall()  # sql문 실행해서 데이터 가져오기
+        for i in range(len(rs)):
+            driver, e_id, e_pw, n_id, n_pw, slack_url = database(conn, i)
+            login_sunmoon(driver, e_id, e_pw)
+            data = data_extraction(driver)
+            login_naver(driver, n_id, n_pw)
+            add_calendar(driver, data)
+            send_text("네이버 캘린더에 추가했습니다.", slack_url)
+            driver.close()
+            driver.quit()
+            time.sleep(2)
+    except:
+        send_text("네이버 캘린더에 추가못했습니다.", slack_url)
+    finally:
+        conn.close()
 
 if __name__ == "__main__":
     main()
