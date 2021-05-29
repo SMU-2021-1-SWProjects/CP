@@ -14,6 +14,30 @@ import datetime
 import pymysql
 
 
+def send_text(text, url):
+    slack_url = url
+    data = json.dumps({
+        'username': 'auto-add-to-naver-calendar',
+        'text': text,
+    })
+    requests.post(slack_url, data=data)
+
+def get_driver():
+    # options = webdriver.ChromeOptions()
+    options = Options()
+    options.add_argument('--disable-gpu');
+    options.add_argument('--disable-extensions');
+    options.add_argument('--proxy-server="direct://"');
+    options.add_argument('--proxy-bypass-list=*');
+    options.add_argument('--start-maximized');
+    options.add_argument('--kiosk')
+    options.add_experimental_option("excludeSwitches", ['enable-automation'])
+
+    DRIVER_PATH = "chomedriver path"
+    driver = webdriver.Chrome(executable_path=DRIVER_PATH, chrome_options=options)
+
+    return driver
+
 def login_sunmoon(driver, eid, epw):
     driver.get("https://lms.sunmoon.ac.kr/ilos/main/member/login_form.acl")
     time.sleep(1)
@@ -46,49 +70,6 @@ def login_naver(driver, nid, npw):
     login_btn.click()
     time.sleep(3)
 
-
-def database(driver):
-    conn = pymysql.connect(host='localhost', user='root',
-                           password='mysql_76', db='react_native', charset='utf8')
-
-    try:
-        with conn.cursor() as curs:
-            sql = "SELECT * FROM react_native.id_pw;"
-            curs.execute(sql)  # 실행할 sql문 넣기
-            rs = curs.fetchall()  # sql문 실행해서 데이터 가져오기
-        for i in range(len(rs)):
-            e_id = rs[i][1]
-            e_pw = rs[i][2]
-            n_id = rs[i][3]
-            n_pw = rs[i][4]
-
-            options = webdriver.ChromeOptions()
-            options = Options()
-            options.add_argument('--disable-gpu')
-            options.add_argument('--disable-extensions')
-            options.add_argument('--proxy-server="direct://"')
-            options.add_argument('--proxy-bypass-list=*')
-            options.add_argument('--start-maximized')
-            # options.add_argument('--kiosk') #window最大
-            # chrome は自動テスト ソフトウェアによって制御されています
-            options.add_experimental_option(
-                "excludeSwitches", ['enable-automation'])
-
-            DRIVER_PATH = "/Users/ritsushi/Documents/chomedriver/chromedriver_ver90.0.4430.24"
-            driver = webdriver.Chrome(
-                executable_path=DRIVER_PATH, chrome_options=options)
-
-            login_sunmoon(driver, e_id, e_pw)
-            data = data_extraction(driver)
-            login_naver(driver, n_id, n_pw)
-            add_calendar(driver, data)
-
-            driver.close()
-            driver.quit()
-    finally:
-        conn.close()
-
-
 def data_extraction(driver):
     data_lst = []
 
@@ -98,8 +79,7 @@ def data_extraction(driver):
     current_month = dt_now.month
     current_day = dt_now.day
 
-    # for i in range(len(subjects)):
-    for i in range(1):
+    for i in range(len(subjects)):
         subjects = driver.find_elements_by_class_name('sub_open')
         subjects[i].click()
         time.sleep(1)
@@ -107,85 +87,72 @@ def data_extraction(driver):
             driver.find_element_by_id('menu_report').click()
             time.sleep(1)
 
-            assignments_num = driver.find_element_by_css_selector(
-                "#report_list > table > tbody > tr:nth-child(1) > td:nth-child(1)").text
+            assignments_num = driver.find_element_by_css_selector("#report_list > table > tbody > tr:nth-child(1) > td:nth-child(1)").text
             if assignments_num != "조회할 자료가 없습니다":
                 assignments_num = int(assignments_num)
                 for j in range(assignments_num):
                     assignment_data = []
-                    assignments = driver.find_elements_by_class_name(
-                        'subjt_top')
+                    assignments = driver.find_elements_by_class_name('subjt_top')
                     assignments[j].click()
                     time.sleep(1)
                     texts = driver.find_element_by_id("content_text")
                     trs = texts.find_elements(By.TAG_NAME, "tr")
 
                     # publication date
-                    publication_date = trs[2].find_element(
-                        By.TAG_NAME, "td").text
+                    publication_date = trs[2].find_element(By.TAG_NAME, "td").text
 
-                    subject_name = driver.find_element_by_xpath(
-                        "//*[@id='content_location']/div/a[2]").text
-                    assignment_name = trs[0].find_element(
-                        By.TAG_NAME, "td").text
-                    title = subject_name + " + " + assignment_name
-                    assignment_data.append(title)
-                    assignment_data.append(
-                        trs[2].find_element(By.TAG_NAME, "td").text)
-                    assignment_data.append(
-                        trs[3].find_element(By.TAG_NAME, "td").text)
-                    data_lst.append(assignment_data)
+                    lst = publication_date.split(" ")
+                    publication_lst = lst[0]
+                    publication_date_lst = publication_lst.split(".")
+                    publication_month = int(publication_date_lst[1])
+                    publication_day = int(publication_date_lst[2])
+                    if publication_month == current_month and publication_day == current_day:
+                        subject_name = driver.find_element_by_xpath("//*[@id='content_location']/div/a[2]").text
+                        assignment_name = trs[0].find_element(By.TAG_NAME, "td").text
+                        title = subject_name + " + " + assignment_name
+                        assignment_data.append(title)
+                        assignment_data.append(trs[2].find_element(By.TAG_NAME, "td").text)
+                        assignment_data.append(trs[3].find_element(By.TAG_NAME, "td").text)
+                        data_lst.append(assignment_data)
                     driver.find_element_by_id('menu_report').click()
                     time.sleep(1)
             # reload
             driver.get("https://lms.sunmoon.ac.kr/ilos/main/main_form.acl")
             time.sleep(1)
 
+        # e-강의동이 다르게 생긴 페이지
         except NoSuchElementException:
-            icon_nums = driver.find_elements_by_class_name(
-                'chapter_content_icon')
-            print("icon nums: {}".format(len(icon_nums)))
-            elems = driver.find_elements_by_class_name(
-                'chapter_content_title_wrap')
-            print("elems: {}".format(len(elems)))
+            pass
+            icon_nums = driver.find_elements_by_class_name('chapter_content_icon')
+            elems = driver.find_elements_by_class_name('chapter_content_title_wrap')
 
             for i in range(len(icon_nums)):
-                elems = driver.find_elements_by_class_name(
-                    'chapter_content_title_wrap')
-                print("{}回目".format(i+1))
-                title = elems[i].find_element_by_tag_name(
-                    'img').get_attribute('title')
+                elems = driver.find_elements_by_class_name('chapter_content_title_wrap')
+                title = elems[i].find_element_by_tag_name('img').get_attribute('title')
                 if title == "과제":
                     assignment_data = []
-                    print("{}番目のオブジェクト".format(i+1))
                     elems[i].click()
                     time.sleep(1)
                     texts = driver.find_element_by_id("content_text")
                     trs = texts.find_elements(By.TAG_NAME, "tr")
 
-                    subject_name = driver.find_element_by_xpath(
-                        "//*[@id='online_mode_lect_nm']/span/span[1]").text
-                    assignment_name = trs[0].find_element(
-                        By.TAG_NAME, "td").text
+                    subject_name = driver.find_element_by_xpath("//*[@id='online_mode_lect_nm']/span/span[1]").text
+                    assignment_name = trs[0].find_element(By.TAG_NAME, "td").text
                     title = subject_name + " + " + assignment_name
                     assignment_data.append(title)
-                    assignment_data.append(
-                        trs[3].find_element(By.TAG_NAME, "td").text)
-                    assignment_data.append(
-                        trs[2].find_element(By.TAG_NAME, "td").text)
-                    print("Assignment Data: {}".format(assignment_data))
+                    assignment_data.append(trs[3].find_element(By.TAG_NAME, "td").text)
+                    assignment_data.append(trs[2].find_element(By.TAG_NAME, "td").text)
+                    # print("Assignment Data: {}".format(assignment_data))
                     data_lst.append(assignment_data)
 
-                    driver.get(
-                        "https://lms.sunmoon.ac.kr/ilos/st/course/submain_form.acl")
+                    driver.get("https://lms.sunmoon.ac.kr/ilos/st/course/submain_form.acl")
                     time.sleep(3)
             # reload
             driver.get("https://lms.sunmoon.ac.kr/ilos/main/main_form.acl")
             time.sleep(1)
 
-    print("All data : {}".format(data_lst))
+    # print("All data : {}".format(data_lst))
     return data_lst
-
 
 def add_calendar(driver, data_lst):
     for data in data_lst:
@@ -244,33 +211,28 @@ def add_calendar(driver, data_lst):
         driver.get("https://calendar.naver.com")
         time.sleep(2)
 
-
 def main():
-    #options = Options()
-    options = webdriver.ChromeOptions()
-    options = Options()
-    options.add_argument('--disable-gpu')
-    options.add_argument('--disable-extensions')
-    options.add_argument('--proxy-server="direct://"')
-    options.add_argument('--proxy-bypass-list=*')
-    options.add_argument('--start-maximized')
-    # options.add_argument('--kiosk') #window最大
-    # chrome は自動テスト ソフトウェアによって制御されています
-    options.add_experimental_option("excludeSwitches", ['enable-automation'])
-
-    DRIVER_PATH = "/Users/ritsushi/Documents/chomedriver/chromedriver_ver90.0.4430.24"
-    driver = webdriver.Chrome(
-        executable_path=DRIVER_PATH, chrome_options=options)
-
-    # login_sunmoon(driver)
-    # data = data_extraction(driver)
-    # # login_naver(driver)
-    # # add_calendar(driver, data)
-    # driver.close()
-    # driver.quit()
-    database(driver)
-    print("driver stop")
-
+    conn = pymysql.connect(host='localhost', user='root',
+                       password='pw', db='db name', charset='utf8')
+    try:
+        with conn.cursor() as curs:
+            sql = "sql문"
+            curs.execute(sql)  # 실행할 sql문 넣기
+            rs = curs.fetchall()  # sql문 실행해서 데이터 가져오기
+        for i in range(len(rs)):
+            driver, e_id, e_pw, n_id, n_pw, slack_url = database(conn, i)
+            login_sunmoon(driver, e_id, e_pw)
+            data = data_extraction(driver)
+            login_naver(driver, n_id, n_pw)
+            add_calendar(driver, data)
+            send_text("네이버 캘린더에 추가했습니다.", slack_url)
+            driver.close()
+            driver.quit()
+            time.sleep(2)
+    except:
+        send_text("네이버 캘린더에 추가못했습니다.", slack_url)
+    finally:
+        conn.close()
 
 if __name__ == "__main__":
     main()
