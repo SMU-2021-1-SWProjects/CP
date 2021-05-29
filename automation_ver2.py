@@ -79,8 +79,7 @@ def data_extraction(driver):
     current_month = dt_now.month
     current_day = dt_now.day
 
-    # for i in range(len(subjects)):
-    for i in range(1):
+    for i in range(len(subjects)):
         subjects = driver.find_elements_by_class_name('sub_open')
         subjects[i].click()
         time.sleep(1)
@@ -125,20 +124,16 @@ def data_extraction(driver):
         except NoSuchElementException:
             icon_nums = driver.find_elements_by_class_name(
                 'chapter_content_icon')
-            print("icon nums: {}".format(len(icon_nums)))
             elems = driver.find_elements_by_class_name(
                 'chapter_content_title_wrap')
-            print("elems: {}".format(len(elems)))
 
             for i in range(len(icon_nums)):
                 elems = driver.find_elements_by_class_name(
                     'chapter_content_title_wrap')
-                print("{}回目".format(i+1))
                 title = elems[i].find_element_by_tag_name(
                     'img').get_attribute('title')
                 if title == "과제":
                     assignment_data = []
-                    print("{}番目のオブジェクト".format(i+1))
                     elems[i].click()
                     time.sleep(1)
                     texts = driver.find_element_by_id("content_text")
@@ -154,7 +149,6 @@ def data_extraction(driver):
                         trs[3].find_element(By.TAG_NAME, "td").text)
                     assignment_data.append(
                         trs[2].find_element(By.TAG_NAME, "td").text)
-                    print("Assignment Data: {}".format(assignment_data))
                     data_lst.append(assignment_data)
 
                     driver.get(
@@ -164,7 +158,7 @@ def data_extraction(driver):
             driver.get("https://lms.sunmoon.ac.kr/ilos/main/main_form.acl")
             time.sleep(1)
 
-    print("All data : {}".format(data_lst))
+    # print("All data : {}".format(data_lst))
     return data_lst
 
 
